@@ -35,7 +35,7 @@ function FormMessage({ room_id }){
   const onChangeUpload = e => {
     e.preventDefault()
     const files = e.target.files
-    console.log(files)
+    
     addAttachment({
       variables: {
         files,
@@ -45,11 +45,11 @@ function FormMessage({ room_id }){
   }
 
   return (
-    <form onSubmit={onAddMessage} className="flex">
-      <div className="flex mr-2 relative hover-trigger">
+    <form onSubmit={onAddMessage} className="flex p-1 items-center justify-center border-t">
+      <div className="flex mr-1 relative hover-trigger">
         <div className="absolute -top-12 left-0 w-32 flex flex-col space-y-1 bg-gray-300 rounded px-2 py-1 hover-target">
-          <label class="flex items-center cursor-pointer">
-            <span class="text-sm leading-normal">Attach Image</span>
+          <label className="flex items-center cursor-pointer">
+            <span className="text-sm leading-normal">Attach Image</span>
             <input 
               className="hidden"
               accept="image/*"
@@ -58,8 +58,8 @@ function FormMessage({ room_id }){
               onChange={onChangeUpload}
             />   
           </label>
-          <label class="flex items-center cursor-pointer">
-            <span class="text-sm leading-normal">Attach Video</span>
+          <label className="flex items-center cursor-pointer">
+            <span className="text-sm leading-normal">Attach Video</span>
             <input 
               className="hidden"
               accept="video/*"
@@ -73,7 +73,7 @@ function FormMessage({ room_id }){
       </div>
       <input 
         placeholder="Type a message..."
-        className="border border-gray-300 rounded-full flex-1 h-10 px-5"
+        className="border border-gray-300 rounded-full flex-1 h-8 px-5"
         onChange={(e) => setMessage(e.target.value)}
         value={message}
       />

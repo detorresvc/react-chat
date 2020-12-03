@@ -1,5 +1,8 @@
+
+import { useState } from 'react';
 import { useQuery, gql } from 'graphql/client';
 import { Icon } from 'components';
+import Viewer from 'react-viewer';
 
 const MESSAGES = gql`
 query showImage($id:ID!){
@@ -8,7 +11,7 @@ query showImage($id:ID!){
 `;
 
 function PlaceHolderAttachment(props){
-
+  const [ visible, setVisible ] = useState(false);
   const { data: { viewImage } = '', loading } = useQuery(MESSAGES, {
     variables: {
       id: props.id
@@ -21,7 +24,14 @@ function PlaceHolderAttachment(props){
 
   if(/image/g.test(props.mimetype)){
     return (
-      <img className="w-20" src={`data:${props.mimetype};base64, ${viewImage}`}/>
+      <>
+      <img onClick={() => setVisible(true)} className="w-20 cursor-pointer" src={`data:${props.mimetype};base64, ${viewImage}`}/>
+      <Viewer
+        visible={visible}
+        onClose={() => { setVisible(false); } }
+        images={[{src: `data:${props.mimetype};base64, ${viewImage}`, alt: ''}]}
+        />
+      </>
     )  
   }
 

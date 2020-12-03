@@ -50,7 +50,7 @@ subscription OnRoomUpdated{
 
 function Room({ onSelect, selected }){
 
-  const { data: { userRooms } = { userRooms: [] }, subscribeToMore, startPolling, stopPolling } = useQuery(ROOM_LIST, { 
+  const { data: { userRooms } = { userRooms: [] }, subscribeToMore,  stopPolling } = useQuery(ROOM_LIST, { 
     notifyOnNetworkStatusChange: true,
     pollInterval: 60000
    })
@@ -59,7 +59,7 @@ function Room({ onSelect, selected }){
     return () => {
       stopPolling()
     }
-  }, [startPolling, stopPolling])
+  }, [stopPolling])
 
   const subscribeToNewRoom = () => {
     return subscribeToMore({

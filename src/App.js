@@ -8,6 +8,7 @@ import {
 import { ToastContainer } from 'react-toastify';
 import Login from 'scenes/login/Login';
 import Main from './scenes/main/Main';
+import Widget from './scenes/widget/Widget';
 import Cookies from 'js-cookie';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -24,9 +25,14 @@ function App() {
             <Login />
           </Route>}
           {isAuthenticated &&
-          <Route path="/">
+          <>
+          <Route exact path="/">
             <Main />
-          </Route>}
+          </Route>
+          <Route path="/widget">
+            <Widget />
+          </Route>
+          </>}
         </Switch>
       </Router>
       <ToastContainer />

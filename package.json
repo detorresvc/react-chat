@@ -17,6 +17,7 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.1",
     "react-toastify": "^6.1.0",
+    "react-viewer": "^3.2.2",
     "subscriptions-transport-ws": "^0.9.18",
     "tailwindcss": "^2.0.1",
     "web-vitals": "^0.2.4"
@@ -26,7 +27,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "dev": "postcss ./src/assets/styles.css -o -w ./src/assets/tailwind/styles.css"
+    "dev": "postcss ./src/assets/styles.css -o ./src/assets/tailwind/styles.css"
   },
   "eslintConfig": {
     "extends": [

@@ -93,13 +93,16 @@ function Message({ user_id, room_id }){
     subscribeToMore,
     fetchMore
   } = useQuery(MESSAGES, {
+    notifyOnNetworkStatusChange: true,
     variables: {
       room_id,
       page
     },
     onCompleted: ({ roomMessages }) => {   
       if(roomMessages.pagination.page === 1){
-        scrollToBottom()
+        setTimeout(() => {
+          scrollToBottom()
+        }, 500)
       }
     }
   })
@@ -128,7 +131,7 @@ function Message({ user_id, room_id }){
         if(isMe){
           setTimeout(() => {
             scrollToBottom()
-          }, 100)
+          }, 500)
         }
 
         return {
@@ -157,10 +160,12 @@ function Message({ user_id, room_id }){
           page: nextPage
         },
         updateQuery: (prevData, { fetchMoreResult }) => {
-          
+
+          setTimeout(() => {
           const div = messagesRef.current
           div.scrollTop = div.scrollHeight/fetchMoreResult.roomMessages.pagination.page
-          
+          }, 500)
+
           fetchMoreResult.roomMessages.messages = [
             ...fetchMoreResult.roomMessages.messages,
             ...prevData.roomMessages.messages,
@@ -190,36 +195,32 @@ function Message({ user_id, room_id }){
       div.removeEventListener('scroll', fethMoreMessages)
     }
   }, [pagination])
- 
+  
   
   return (
-    <div className="flex flex-col">
-      <div ref={messagesRef} className="flex flex-col overflow-auto" style={{ height: 'calc(100vh - 55px)' }}>
-        {pagination.page === pagination.pageCount && <p className="w-full text-center">*** end of line ***</p>}
-        {loading && <p className="w-full text-center">Loading...</p>}
-        {messages.map(message => {
-          const isMe = user_id === message.user_id
-          return (
-            <div key={`${message.user_id}${message.id}`} className={`flex flex-col p-2 ${isMe ? 'items-end' : 'items-start'}`}>
-              <small className="text-xs">{message.user?.name}</small>
-              <div className="my-1">
-                {message.attachments.length > 0 &&
-                  <div className={`grid ${message.attachments.length > 3 ? 'grid-cols-3' : 'grid-cols-1'} gap-2 space-y-2 max-w-prose text-sm rounded px-3 py-2 flex-0 ${isMe ? 'bg-gray-600 text-white' : 'bg-blue-600 text-white'}`}>
-                    {message.attachments.map(attchmnt => <PlaceHolderAttachment mimetype={attchmnt.mimetype} id={attchmnt.id}/>)}
-                  </div>
-                }
-                {message.attachments.length === 0 &&
-                  <p className={`max-w-prose text-sm rounded-full px-3 py-2 flex-0 ${isMe ? 'bg-gray-600 text-white' : 'bg-blue-600 text-white'}`}>{message.message}</p>
-                }
-              </div>
-              <small className="text-xs">{message.created_at}</small>
+    <div ref={messagesRef} className="flex flex-col overflow-auto">
+      {pagination.page === pagination.pageCount && <p className="w-full text-center">*** end of line ***</p>}
+      {loading && <p className="w-full text-center">Loading...</p>}
+      {messages.map(message => {
+        
+        const isMe = +user_id === +message.user_id
+        return (
+          <div key={`${message.user_id}${message.id}`} className={`flex flex-col p-2 ${isMe ? 'items-end' : 'items-start'}`}>
+            <small className="text-xs">{message.user?.name}</small>
+            <div className="my-1">
+              {message.attachments?.length > 0 &&
+                <div className={`grid ${message.attachments?.length > 3 ? 'grid-cols-3' : 'grid-cols-1'} gap-2 space-y-2 max-w-prose text-sm rounded px-3 py-2 flex-0 ${isMe ? 'bg-gray-600 text-white' : 'bg-blue-600 text-white'}`}>
+                  {message.attachments.map(attchmnt => <PlaceHolderAttachment mimetype={attchmnt.mimetype} id={attchmnt.id}/>)}
+                </div>
+              }
+              {message.attachments?.length === 0 &&
+                <p className={`max-w-prose text-sm px-3 py-2 flex-0 ${isMe ? 'bg-gray-600 text-white' : 'bg-blue-600 text-white'} ${message.message.length > 100 ? 'rounded' : 'rounded-full'}`}>{message.message}</p>
+              }
             </div>
-          )
-        })}
-      </div>
-      <div className="h-10 p-2">
-        <FormMessage room_id={room_id}/>
-      </div>
+            <small className="text-xs">{message.created_at}</small>
+          </div>
+        )
+      })}
     </div>
   )
 

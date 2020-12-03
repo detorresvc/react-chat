@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Container, LeftPane, RightPane } from 'components';
 import Room from 'container/room/Room';
 import Message from 'container/message/Message';
+import FormMessage from 'container/message/FormMessage';
 import { useQuery, gql } from 'graphql/client';
 
 const USER = gql`
@@ -52,7 +53,11 @@ function Main(){
       </LeftPane>
       <RightPane>
         {selectedRoom &&
-          <Message key={`User${showUser.id}Room${selectedRoom?.id}`} user_id={showUser.id} room_id={selectedRoom?.id}/>}
+          <>
+            <Message key={`User${showUser.id}Room${selectedRoom?.id}`} user_id={showUser.id} room_id={selectedRoom?.id}/>
+            <FormMessage room_id={selectedRoom?.id}/>
+          </>
+        }
       </RightPane>
     </Container>
   )
