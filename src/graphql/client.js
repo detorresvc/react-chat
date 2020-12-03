@@ -35,8 +35,12 @@ const splitLink = split(
   httpLink,
 );
 
-const link = onError(({ graphQLErrors, networkError }) => {
-  
+const link = onError(({ graphQLErrors, networkError, operation, response }) => {
+    
+  if (["onGetConsumer"].indexOf(operation.operationName) > -1) {
+    return response.errors = null;
+  }
+
   if (graphQLErrors){
     
     graphQLErrors.map(({ message, locations, path }) =>

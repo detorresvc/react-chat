@@ -1,11 +1,46 @@
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 import { Icon } from 'components';
 import Message from 'container/message/Message';
 import FormMessage from 'container/message/FormMessage';
+import { useQuery, gql } from 'graphql/client';
 
-function Widget(){
+
+const CONSUMER = gql`
+query onGetConsumer($access_key: String!) {
+  getConsumer(access_key:$access_key) {
+    name
+  }
+}
+`;
+
+function Widget({ access_key }){
 
   const [isOpen, setIsOpen] = useState(false)
+  const { data , loading } = useQuery(CONSUMER, {
+    variables: {
+      access_key
+    }
+  })
+
+  if(loading){
+    return (
+      <div 
+        className={`bg-blue-800 rounded-full w-auto fixed bottom-5 right-5 p-3`}>
+        <Icon.Spinner className="animate-spin w-10 h-10 fill-current text-white m-auto"/>
+      </div>
+    )
+  }
+  
+  if(!loading && !data?.getConsumer){
+    return (
+      <div 
+        title="EChat: Something went wrong!"
+        className={`bg-white rounded-full w-auto fixed bottom-5 right-5 p-3`}>
+        <Icon.Exclamation className="w-10 h-10 fill-current text-white m-auto"/>
+      </div>
+    )
+  }
 
   const onShowChat = e => {
     e.preventDefault()
@@ -46,11 +81,19 @@ function Widget(){
       </div>
       <div 
         onClick={onShowChat}
-        className={`bg-blue-800 rounded-full w-auto absolute bottom-5 right-5 p-3 cursor-pointer ${isOpen ? 'hidden' : ''}`}>
+        className={`bg-blue-800 rounded-full w-auto fixed bottom-5 right-5 p-3 cursor-pointer ${isOpen ? 'hidden' : ''}`}>
         <Icon.Chat className="w-10 h-10 fill-current text-white m-auto"/>
       </div>
     </>
   )
+}
+
+Widget.defaultProps = {
+  access_key: '1234'
+}
+
+Widget.propTypes = {
+  access_key: PropTypes.string.isRequired
 }
 
 export default Widget
