@@ -1,7 +1,8 @@
 
 import { useState } from 'react';
 import { useMutation, gql } from 'graphql/client';
-
+import { Icon } from 'components';
+import './hover.css';
 
 const ADD_MESSAGES = gql`
 mutation SendMessage($room_id: ID!, $message: String!){
@@ -45,11 +46,31 @@ function FormMessage({ room_id }){
 
   return (
     <form onSubmit={onAddMessage} className="flex">
-      <input 
-        multiple
-        type="file"
-        onChange={onChangeUpload}
-      />      
+      <div className="flex mr-2 relative hover-trigger">
+        <div className="absolute -top-12 left-0 w-32 flex flex-col space-y-1 bg-gray-300 rounded px-2 py-1 hover-target">
+          <label class="flex items-center cursor-pointer">
+            <span class="text-sm leading-normal">Attach Image</span>
+            <input 
+              className="hidden"
+              accept="image/*"
+              multiple
+              type="file"
+              onChange={onChangeUpload}
+            />   
+          </label>
+          <label class="flex items-center cursor-pointer">
+            <span class="text-sm leading-normal">Attach Video</span>
+            <input 
+              className="hidden"
+              accept="video/*"
+              multiple
+              type="file"
+              onChange={onChangeUpload}
+            />   
+          </label>
+        </div>
+        <Icon.CirclePlus className="m-auto w-5 h-5 cursor-pointer"/>
+      </div>
       <input 
         placeholder="Type a message..."
         className="border border-gray-300 rounded-full flex-1 h-10 px-5"

@@ -204,7 +204,7 @@ function Message({ user_id, room_id }){
               <small className="text-xs">{message.user?.name}</small>
               <div className="my-1">
                 {message.attachments.length > 0 &&
-                  <div className={`flex flex-col space-y-2 max-w-prose text-sm rounded px-3 py-2 flex-0 ${isMe ? 'bg-gray-600 text-white' : 'bg-blue-600 text-white'}`}>
+                  <div className={`grid ${message.attachments.length > 3 ? 'grid-cols-3' : 'grid-cols-1'} gap-2 space-y-2 max-w-prose text-sm rounded px-3 py-2 flex-0 ${isMe ? 'bg-gray-600 text-white' : 'bg-blue-600 text-white'}`}>
                     {message.attachments.map(attchmnt => <PlaceHolderAttachment mimetype={attchmnt.mimetype} id={attchmnt.id}/>)}
                   </div>
                 }

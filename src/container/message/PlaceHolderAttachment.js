@@ -1,4 +1,5 @@
 import { useQuery, gql } from 'graphql/client';
+import { Icon } from 'components';
 
 const MESSAGES = gql`
 query showImage($id:ID!){
@@ -15,7 +16,7 @@ function PlaceHolderAttachment(props){
   })
   
   if(loading){
-    return 'loading...'
+    return <p className="w-20"><Icon.Spinner className="animate-spin w-5 h-5"/></p>
   }
 
   if(/image/g.test(props.mimetype)){
