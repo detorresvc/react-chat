@@ -5,6 +5,7 @@ import { onError } from "@apollo/client/link/error";
 import { setContext } from '@apollo/client/link/context';
 import Cookies from 'js-cookie';
 import { toast } from 'react-toastify';
+import { createUploadLink } from 'apollo-upload-client';
 
 const wsLink = new WebSocketLink({
   uri: `ws://localhost:4000/graphql`,
@@ -16,9 +17,11 @@ const wsLink = new WebSocketLink({
   }
 });
 
-const httpLink = createHttpLink({
+const httpLink = createUploadLink({
   uri: process.env.REACT_APP_API,
 });
+
+const uploadLink = createUploadLink({ uri: process.env.REACT_APP_API })
 
 const splitLink = split(
   ({ query }) => {
@@ -67,7 +70,7 @@ const authLink = setContext((_, { headers }) => {
 
 const defaultOptions = {
   watchQuery: {
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'network-only',
     errorPolicy: 'ignore',
   },
   query: {
@@ -97,6 +100,7 @@ const typePolicies = {
 const client = new ApolloClient({
   link: authLink.concat(link).concat(splitLink),
   cache: new InMemoryCache(),
+  defaultOptions
 });
 
 export {

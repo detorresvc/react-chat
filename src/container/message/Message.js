@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useQuery, gql } from 'graphql/client';
 import FormMessage from './FormMessage';
+import PlaceHolderAttachment from './PlaceHolderAttachment';
 
 const MESSAGES = gql`
 query getRoomMessages($room_id: ID!, $page: Int){
@@ -19,6 +20,11 @@ query getRoomMessages($room_id: ID!, $page: Int){
       user {
         name
       }
+      attachments {
+        id,
+        filename,
+        mimetype
+      }
     }
   }
 }
@@ -35,6 +41,33 @@ subscription subscibemessage {
     updated_at,
     user {
       name
+    }
+    attachments {
+      id,
+      filename,
+      mimetype
+    }
+  }
+}
+`;
+
+
+const ATTACHMENT_MESSAGE_ADDED = gql`
+subscription subscibemessageAttachment {
+  messageAttachmentAdded {
+    id
+    room_id
+    user_id
+    message
+    created_at,
+    updated_at,
+    user {
+      name
+    }
+    attachments {
+      id,
+      filename,
+      mimetype
     }
   }
 }
@@ -60,26 +93,36 @@ function Message({ user_id, room_id }){
     subscribeToMore,
     fetchMore
   } = useQuery(MESSAGES, {
-    notifyOnNetworkStatusChange: true,
     variables: {
       room_id,
       page
     },
     onCompleted: ({ roomMessages }) => {   
-      console.log('y')   
       if(roomMessages.pagination.page === 1){
         scrollToBottom()
       }
     }
   })
+
+  const whichData = (type) => {
+    if(type === MESSAGE_ADDED){
+      return 'messageAdded'
+    }
+
+    if(type === ATTACHMENT_MESSAGE_ADDED){
+      return 'messageAttachmentAdded'
+    }
+
+    return ''
+  }
   
-  const subscribeToNewMessage = () => {
+  const subscribeToNewMessage = (type) => {
     return subscribeToMore({
-      document: MESSAGE_ADDED,
+      document: type,
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
         
-        const newFeedItem = subscriptionData.data.messageAdded;
+        const newFeedItem = subscriptionData.data[whichData(type)];
         
         const isMe = +newFeedItem.user_id === +user_id
         if(isMe){
@@ -128,7 +171,8 @@ function Message({ user_id, room_id }){
   }
 
   useEffect(() => {
-    subscribeToNewMessage()
+    subscribeToNewMessage(MESSAGE_ADDED)
+    subscribeToNewMessage(ATTACHMENT_MESSAGE_ADDED)
 
   }, [])
 
@@ -159,7 +203,14 @@ function Message({ user_id, room_id }){
             <div key={`${message.user_id}${message.id}`} className={`flex flex-col p-2 ${isMe ? 'items-end' : 'items-start'}`}>
               <small className="text-xs">{message.user?.name}</small>
               <div className="my-1">
-                <p className={`max-w-prose text-sm rounded-full px-3 py-2 flex-0 ${isMe ? 'bg-gray-600 text-white' : 'bg-blue-600 text-white'}`}>{message.message}</p>
+                {message.attachments.length > 0 &&
+                  <div className={`flex flex-col space-y-2 max-w-prose text-sm rounded px-3 py-2 flex-0 ${isMe ? 'bg-gray-600 text-white' : 'bg-blue-600 text-white'}`}>
+                    {message.attachments.map(attchmnt => <PlaceHolderAttachment mimetype={attchmnt.mimetype} id={attchmnt.id}/>)}
+                  </div>
+                }
+                {message.attachments.length === 0 &&
+                  <p className={`max-w-prose text-sm rounded-full px-3 py-2 flex-0 ${isMe ? 'bg-gray-600 text-white' : 'bg-blue-600 text-white'}`}>{message.message}</p>
+                }
               </div>
               <small className="text-xs">{message.created_at}</small>
             </div>
