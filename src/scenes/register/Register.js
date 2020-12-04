@@ -1,26 +1,29 @@
 import { useState } from 'react';
 import { Icon, InputText, InputWithLabel, Button } from 'components';
 import { useMutation, gql } from 'graphql/client';
-import { Link } from 'react-router-dom';
 import Cookies from 'js-cookie';
 
-const SIGN_IN = gql`
-  mutation UserLogin($email: String, $password: String) {
-    login(email: $email, password: $password)
+const REGISTER = gql`
+  mutation ConsumerRegister($email: String!, $name: String!, $password: String!, $confirm_password: String!) {
+    register(email: $email, name: $name, password: $password, confirm_password: $confirm_password)
   }
 `;
 
 const INITIAL_FORM_DATA = {
   email: '',
-  password: ''
+  name: '',
+  password: '',
+  confirm_password: ''
 }
 
-function Login(){
-  const [onSignIn] = useMutation(SIGN_IN, {
+function Register(){
+  const [onRegister] = useMutation(REGISTER, {
     onCompleted: (data) => {
-      if(data?.login){
-        Cookies.set('echat:token', data?.login)
-        window.location.href = "/"
+      if(data?.register){
+        if(data){
+          Cookies.set('echat:token', data?.register)
+          window.location.href = "/"
+        }
       }
     }
   });
@@ -35,7 +38,7 @@ function Login(){
 
   const handleSubmit = e => {
     e.preventDefault()
-    onSignIn({
+    onRegister({
       variables: formData
     })
   }
@@ -51,13 +54,21 @@ function Login(){
             </div>
             <form onSubmit={handleSubmit} className="divide-y divide-gray-200">
               <div className="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
-                <p>SIGN IN</p>
+                <p>REGISTER</p>
                 <InputWithLabel label="Email">
                   <InputText 
                     type="email"
                     name="email"
                     onChange={handleOnChange}
                     value={formData.email}
+                  />
+                </InputWithLabel>
+                <InputWithLabel label="Company Name">
+                  <InputText 
+                    type="text"
+                    name="name"
+                    onChange={handleOnChange}
+                    value={formData.name}
                   />
                 </InputWithLabel>
                 <InputWithLabel label="Password">
@@ -68,11 +79,18 @@ function Login(){
                     value={formData.password}
                     />
                 </InputWithLabel>
+                <InputWithLabel label="Confirm Password">
+                  <InputText 
+                    type="password"
+                    name="confirm_password"
+                    onChange={handleOnChange}
+                    value={formData.confirm_password}
+                    />
+                </InputWithLabel>
                 
               </div>
-              <div className="pt-6 text-base leading-6 sm:text-lg sm:leading-7 flex gap-x-2 items-center">
-                <Button type="submit">Sign In</Button>
-                <Link to="/register" className="text-xs">Register</Link>
+              <div className="pt-6 text-base leading-6 font-bold sm:text-lg sm:leading-7">
+                <Button type="submit">Register</Button>
               </div>
             </form>
           </div>
@@ -83,4 +101,4 @@ function Login(){
   )
 }
 
-export default Login
+export default Register

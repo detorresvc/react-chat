@@ -65,7 +65,7 @@ function Room({ onSelect, selected }){
     return subscribeToMore({
       document: ROOM_ADDED,
       updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) return prev;
+        if (!subscriptionData.data)    return prev;
   
         const newFeedItem = subscriptionData.data.roomAdded;
         return {
