@@ -21,9 +21,15 @@ function App() {
       <Router>
         <Switch>
           {!isAuthenticated &&
-          <Route path="/">
-            <Login />
-          </Route>}
+          <>
+            <Route exact path="/">
+              <Login />
+            </Route>
+            <Route path="/widget">
+              <Widget />
+            </Route>
+          
+          </>}
           {isAuthenticated &&
           <>
           <Route exact path="/">

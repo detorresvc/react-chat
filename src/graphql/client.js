@@ -37,7 +37,7 @@ const splitLink = split(
 
 const link = onError(({ graphQLErrors, networkError, operation, response }) => {
     
-  if (["onGetConsumer"].indexOf(operation.operationName) > -1) {
+  if (["onGetConsumer", "onWigetLogIn"].indexOf(operation.operationName) > -1) {
     return response.errors = null;
   }
 

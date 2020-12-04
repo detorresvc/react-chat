@@ -10,7 +10,6 @@ const USER = gql`
 query onShowUser{
   showUser {
     id,
-    username,
     name,
     password,
     rooms {
