@@ -29,14 +29,14 @@ function App() {
             <Route path="/register">
               <Register />
             </Route>
-            <Route path="/widget">
-              <Widget />
-            </Route>
           </>}
           {isAuthenticated &&
           <>
           <Route exact path="/">
             <Main />
+          </Route>
+          <Route path="/widget">
+            <Widget />
           </Route>
           </>}
         </Switch>

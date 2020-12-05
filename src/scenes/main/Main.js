@@ -53,7 +53,9 @@ function Main(){
       <RightPane>
         {selectedRoom &&
           <>
-            <Message key={`User${showUser.id}Room${selectedRoom?.id}`} user_id={showUser.id} room_id={selectedRoom?.id}/>
+            <div className="flex-1 flex items-end w-full" style={{ height: 'calc(100% - 40px)' }}>
+              <Message key={`User${showUser.id}Room${selectedRoom?.id}`} user_id={showUser.id} room_id={selectedRoom?.id}/>
+            </div>
             <FormMessage room_id={selectedRoom?.id}/>
           </>
         }

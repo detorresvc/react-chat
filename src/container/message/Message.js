@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useQuery, gql } from 'graphql/client';
-import FormMessage from './FormMessage';
 import PlaceHolderAttachment from './PlaceHolderAttachment';
+import { Icon } from 'components';
+import moment from 'moment';
 
 const MESSAGES = gql`
 query getRoomMessages($room_id: ID!, $page: Int){
@@ -31,8 +32,8 @@ query getRoomMessages($room_id: ID!, $page: Int){
 `;
 
 const MESSAGE_ADDED = gql`
-subscription subscibemessage {
-  messageAdded {
+subscription subscibemessage($room_id: ID!){
+  messageAdded(room_id: $room_id) {
     id
     room_id
     user_id
@@ -53,8 +54,8 @@ subscription subscibemessage {
 
 
 const ATTACHMENT_MESSAGE_ADDED = gql`
-subscription subscibemessageAttachment {
-  messageAttachmentAdded {
+subscription subscibemessageAttachment($room_id: ID!) {
+  messageAttachmentAdded(room_id: $room_id) {
     id
     room_id
     user_id
@@ -74,12 +75,14 @@ subscription subscibemessageAttachment {
 `;
 
 function Message({ user_id, room_id }){
+  
   const [page, setPage] = useState(1)
   const messagesRef = useRef()
   
   const scrollToBottom = () => {
     const div = messagesRef.current
-    div.scrollTop = div.scrollHeight - div.clientHeight;
+    if(div)
+      div.scrollTop = div.scrollHeight - div.clientHeight;
   }
 
   const { 
@@ -120,8 +123,12 @@ function Message({ user_id, room_id }){
   }
   
   const subscribeToNewMessage = (type) => {
+    
     return subscribeToMore({
       document: type,
+      variables: {
+        room_id: +room_id,
+      },
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
         
@@ -176,9 +183,9 @@ function Message({ user_id, room_id }){
   }
 
   useEffect(() => {
+    
     subscribeToNewMessage(MESSAGE_ADDED)
     subscribeToNewMessage(ATTACHMENT_MESSAGE_ADDED)
-
   }, [])
 
   useEffect(() => {
@@ -190,7 +197,7 @@ function Message({ user_id, room_id }){
     }
 
     div.addEventListener("scroll", fethMoreMessages);
-
+        
     return () => {
       div.removeEventListener('scroll', fethMoreMessages)
     }
@@ -198,14 +205,13 @@ function Message({ user_id, room_id }){
   
   
   return (
-    <div ref={messagesRef} className="flex flex-col overflow-auto">
+    <div ref={messagesRef} className={`flex flex-col overflow-y-auto overflow-x-hidden w-full h-full min-h-full max-h-full relative`} >
       {pagination.page === pagination.pageCount && <p className="w-full text-center">*** end of line ***</p>}
-      {loading && <p className="w-full text-center">Loading...</p>}
+      {loading && <p className="w-full text-center absolute h-full flex"><Icon.Spinner className="m-auto animate-spin w-5 h-5" /></p>}
       {messages.map(message => {
-        
         const isMe = +user_id === +message.user_id
         return (
-          <div key={`${message.user_id}${message.id}`} className={`flex flex-col p-2 ${isMe ? 'items-end' : 'items-start'}`}>
+          <div key={`${message.user_id}${message.id}`} className={`flex min-auto flex-col p-2 ${isMe ? 'items-end' : 'items-start'}`}>
             <small className="text-xs">{message.user?.name}</small>
             <div className="my-1">
               {message.attachments?.length > 0 &&
@@ -217,7 +223,7 @@ function Message({ user_id, room_id }){
                 <p className={`max-w-prose text-sm px-3 py-2 flex-0 ${isMe ? 'bg-gray-600 text-white' : 'bg-blue-600 text-white'} ${message.message.length > 100 ? 'rounded' : 'rounded-full'}`}>{message.message}</p>
               }
             </div>
-            <small className="text-xs">{message.created_at}</small>
+            <small className="text-xs">{moment(message.created_at, 'MM/DD/YYYY HH:mm:ss A').format('h:mm: A')}</small>
           </div>
         )
       })}

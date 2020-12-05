@@ -1,6 +1,6 @@
 function RightPane(props){
   return (
-    <div className="flex-1 h-screen min-h-screen flex flex-col">
+    <div className="flex-1 h-full min-h-full flex flex-col overflow-hidden">
       {props.children}
     </div>
   )

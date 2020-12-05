@@ -21,8 +21,6 @@ const httpLink = createUploadLink({
   uri: process.env.REACT_APP_API,
 });
 
-const uploadLink = createUploadLink({ uri: process.env.REACT_APP_API })
-
 const splitLink = split(
   ({ query }) => {
     const definition = getMainDefinition(query);

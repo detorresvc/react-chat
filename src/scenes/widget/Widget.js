@@ -26,10 +26,20 @@ mutation onWigetLogIn($access_key: String!, $token: String!){
 }
 `;
 
+const CREATE_ROOM = gql`
+mutation onCreateRoom{
+  createRoom{
+    id,
+    name
+  }  
+}
+`
+
 function Widget({ access_key, token }){
+  
   const [widgetStatus, setWidgetStatus] = useState('validating')
   const [isOpen, setIsOpen] = useState(false)
-  const { data , loading } = useQuery(CONSUMER, {
+  const { data  } = useQuery(CONSUMER, {
     variables: {
       access_key
     },
@@ -40,13 +50,25 @@ function Widget({ access_key, token }){
     }
   })
 
+  const [onCreateRoom, {
+    data: roomData
+  }] = useMutation(CREATE_ROOM, {
+    onCompleted: (data) => {
+      if(data?.createRoom)
+        return setWidgetStatus('ready')
+      return setWidgetStatus('error')
+    }
+  })
+
   const [widgetLogin, { 
-    data: widgetdata, loading : widgetLoginLoading
+    data: widgetdata
   }] = useMutation(WIDGET_LOGIN, {
     onCompleted: (data) => {
       
-      if(data?.widgetLogin)
-        return setWidgetStatus('ready')
+      if(data?.widgetLogin){
+        onCreateRoom()
+        return setWidgetStatus('validating')
+      }
       return setWidgetStatus('error')
     }
   })
@@ -61,7 +83,7 @@ function Widget({ access_key, token }){
 
     Cookies.set('echat:token', token)
   }, [])
-
+  
   if(widgetStatus === 'validating'){
     return (
       <div 
@@ -88,20 +110,44 @@ function Widget({ access_key, token }){
   
   return (
     <>
+      {isOpen &&
       <div 
         className={`
         bg-white
           border
           rounded 
           fixed 
-          bottom-5 
-          right-5 
-          cursor-pointer ${isOpen ? '' : 'hidden'}
-          h-96
-          w-80
-          min-w-80
+          cursor-pointer 
+          ${isOpen ? '' : 'hidden'}
           flex 
           flex-col
+
+          bottom-0
+          xl:bottom-5
+          lg:bottom-5
+          md:bottom-5
+
+          right-0
+          xl:right-5
+          lg-right-5 
+          md-right-5 
+          
+          h-full
+          xl:h-96
+          lg:h-96
+          md:h-96
+
+          w-full
+          xl:w-80
+          lg:w-80
+          md:w-80
+
+          min-w-full
+          xl:min-w-80
+          lg:min-w-80
+          md:min-w-80
+          
+          
         `}>
         <div className="flex space-x-2 items-center border-b rounded-t h-10 min-h-10 px-2 bg-blue-800">
           <div>
@@ -115,9 +161,11 @@ function Widget({ access_key, token }){
           </div>
           
         </div>
-        <Message room_id={widgetdata?.widgetLogin?.rooms[0].id} user_id={widgetdata?.widgetLogin?.id}/>
-        <FormMessage room_id={widgetdata?.widgetLogin?.rooms[0].id}/>
-      </div>
+        <div className="flex-1 flex overflow-x-hidden overflow-y-auto w-full">
+          <Message room_id={+roomData?.createRoom?.id} user_id={+widgetdata?.widgetLogin?.id}/>
+        </div>
+        <FormMessage room_id={+roomData?.createRoom?.id}/>
+      </div>}
       <div 
         onClick={onShowChat}
         className={`bg-blue-800 rounded-full w-auto fixed bottom-5 right-5 p-3 cursor-pointer ${isOpen ? 'hidden' : ''}`}>
@@ -128,8 +176,8 @@ function Widget({ access_key, token }){
 }
 
 Widget.defaultProps = {
-  access_key: '123',
-  token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJlZTJAZW1haWwuY29tIiwiaWF0IjoxNjA3MDU1Mzc5LCJleHAiOjE2MDcxNDE3Nzl9.G4dBJev9Rl8WphPdvhFxlPehcm9KI7Hda05D83FlzSQ'
+  access_key: '456',
+  token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NjAsImlhdCI6MTYwNzE4MTUzNSwiZXhwIjoxNjA3MjY3OTM1fQ.e95MmmVaHdKjZst-0KCrw5CXty_DWArITRW4y6dqyiM'
 }
 
 Widget.propTypes = {
