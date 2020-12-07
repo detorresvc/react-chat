@@ -50,7 +50,7 @@ subscription OnRoomUpdated{
 
 function Room({ onSelect, selected }){
 
-  const { data: { userRooms } = { userRooms: [] }, subscribeToMore,  stopPolling } = useQuery(ROOM_LIST, { 
+  const { data: { userRooms } = { userRooms: [] }, subscribeToMore,  stopPolling, networkStatus } = useQuery(ROOM_LIST, { 
     notifyOnNetworkStatusChange: true,
     pollInterval: 60000
    })
@@ -62,7 +62,7 @@ function Room({ onSelect, selected }){
   }, [stopPolling])
 
   const subscribeToNewRoom = () => {
-    return subscribeToMore({
+    return networkStatus === 7 && subscribeToMore({
       document: ROOM_ADDED,
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data)    return prev;
@@ -79,7 +79,7 @@ function Room({ onSelect, selected }){
   }
 
   const subscribeToUpdatedRoom = () => {
-    return subscribeToMore({
+    return networkStatus === 7 && subscribeToMore({
       document: ROOM_UPDATED,
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
@@ -116,7 +116,7 @@ function Room({ onSelect, selected }){
           <div 
             onClick={onSelect(room)}
             key={`${room.type}${room.id}`} 
-            className={`h-20 overflow-hidden border-b border-gray-300 flex items-center p-2 ${room.id === selected ? 'bg-gray-100' : ''}`}>
+            className={`h-20 cursor-pointer overflow-hidden border-b border-gray-300 flex items-center p-2 ${room.id === selected ? 'bg-gray-100' : ''}`}>
             <div className="flex flex-col w-full">
               <p>{room.name}</p>
               <div className="flex">

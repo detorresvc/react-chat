@@ -1,4 +1,4 @@
-import { ApolloClient, InMemoryCache, ApolloProvider, useMutation, gql, createHttpLink, useQuery, split, useSubscription } from '@apollo/client';
+import { ApolloClient, InMemoryCache, ApolloProvider, useMutation, gql, createHttpLink, useQuery, split, useSubscription, useLazyQuery } from '@apollo/client';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { WebSocketLink } from '@apollo/client/link/ws';
 import { onError } from "@apollo/client/link/error";
@@ -6,6 +6,7 @@ import { setContext } from '@apollo/client/link/context';
 import Cookies from 'js-cookie';
 import { toast } from 'react-toastify';
 import { createUploadLink } from 'apollo-upload-client';
+import cache from './cache';
 
 const wsLink = new WebSocketLink({
   uri: `ws://localhost:4000/graphql`,
@@ -99,9 +100,11 @@ const typePolicies = {
   }
 }
 
+
+
 const client = new ApolloClient({
   link: authLink.concat(link).concat(splitLink),
-  cache: new InMemoryCache(),
+  cache,
   defaultOptions
 });
 
@@ -110,7 +113,9 @@ export {
   useMutation,
   useQuery,
   useSubscription,
-  gql
+  gql,
+  cache,
+  useLazyQuery
 }
 
 export default client

@@ -3,6 +3,7 @@ import { Icon, InputText, InputWithLabel, Button } from 'components';
 import { useMutation, gql } from 'graphql/client';
 import { Link } from 'react-router-dom';
 import Cookies from 'js-cookie';
+import { isAthenticatedVar } from 'graphql/cache'; 
 
 const SIGN_IN = gql`
   mutation UserLogin($email: String, $password: String) {
@@ -20,6 +21,7 @@ function Login(){
     onCompleted: (data) => {
       if(data?.login){
         Cookies.set('echat:token', data?.login)
+        isAthenticatedVar(true)
         window.location.href = "/"
       }
     }

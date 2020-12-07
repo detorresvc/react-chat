@@ -76,7 +76,6 @@ subscription subscibemessageAttachment($room_id: ID!) {
 
 function Message({ user_id, room_id }){
   
-  const [page, setPage] = useState(1)
   const messagesRef = useRef()
   
   const scrollToBottom = () => {
@@ -94,14 +93,16 @@ function Message({ user_id, room_id }){
     } }, 
     loading,
     subscribeToMore,
-    fetchMore
+    fetchMore,
+    networkStatus
   } = useQuery(MESSAGES, {
     notifyOnNetworkStatusChange: true,
     variables: {
-      room_id,
-      page
+      room_id
     },
+    fetchPolicy: "cache-and-network",
     onCompleted: ({ roomMessages }) => {   
+      
       if(roomMessages.pagination.page === 1){
         setTimeout(() => {
           scrollToBottom()
@@ -109,7 +110,7 @@ function Message({ user_id, room_id }){
       }
     }
   })
-
+  
   const whichData = (type) => {
     if(type === MESSAGE_ADDED){
       return 'messageAdded'
@@ -124,10 +125,10 @@ function Message({ user_id, room_id }){
   
   const subscribeToNewMessage = (type) => {
     
-    return subscribeToMore({
+    return networkStatus === 7 && subscribeToMore({
       document: type,
       variables: {
-        room_id: +room_id,
+        room_id: +room_id
       },
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
@@ -141,7 +142,7 @@ function Message({ user_id, room_id }){
           }, 500)
         }
 
-        return {
+        return Object.assign({}, prev, {
           ...prev,
           roomMessages: {
             ...prev.roomMessages,
@@ -150,7 +151,7 @@ function Message({ user_id, room_id }){
               newFeedItem
             ]
           }
-        }
+        })
       }
     })
   }
@@ -159,7 +160,7 @@ function Message({ user_id, room_id }){
     
     const nextPage = pagination.page + 1
     
-    if(nextPage <= pagination.pageCount)
+    if(nextPage <= pagination.pageCount && networkStatus === 7)
 
       fetchMore({
         variables: {
@@ -186,7 +187,10 @@ function Message({ user_id, room_id }){
     
     subscribeToNewMessage(MESSAGE_ADDED)
     subscribeToNewMessage(ATTACHMENT_MESSAGE_ADDED)
-  }, [])
+
+  
+
+  }, [networkStatus])
 
   useEffect(() => {
     const div = messagesRef.current
@@ -201,7 +205,7 @@ function Message({ user_id, room_id }){
     return () => {
       div.removeEventListener('scroll', fethMoreMessages)
     }
-  }, [pagination])
+  }, [networkStatus])
   
   
   return (
@@ -216,7 +220,7 @@ function Message({ user_id, room_id }){
             <div className="my-1">
               {message.attachments?.length > 0 &&
                 <div className={`grid ${message.attachments?.length > 3 ? 'grid-cols-3' : 'grid-cols-1'} gap-2 space-y-2 max-w-prose text-sm rounded px-3 py-2 flex-0 ${isMe ? 'bg-gray-600 text-white' : 'bg-blue-600 text-white'}`}>
-                  {message.attachments.map(attchmnt => <PlaceHolderAttachment mimetype={attchmnt.mimetype} id={attchmnt.id}/>)}
+                  {message.attachments.map(attchmnt => <PlaceHolderAttachment key={`placeholder${attchmnt.id}`} mimetype={attchmnt.mimetype} id={attchmnt.id}/>)}
                 </div>
               }
               {message.attachments?.length === 0 &&

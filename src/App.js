@@ -1,4 +1,5 @@
 
+import React from 'react';
 import "./assets/tailwind/styles.css"
 import {
   BrowserRouter as Router,
@@ -10,18 +11,20 @@ import Login from 'scenes/login/Login';
 import Register from 'scenes/register/Register';
 import Main from './scenes/main/Main';
 import Widget from './scenes/widget/Widget';
-import Cookies from 'js-cookie';
+
 import 'react-toastify/dist/ReactToastify.css';
 
+import { isAthenticatedVar, useReactiveVar } from 'graphql/cache'; 
+
+
 function App() {
-
-  const isAuthenticated = Cookies.get('echat:token')
-
+  const isAthenticated = useReactiveVar(isAthenticatedVar)
+  
   return (
     <>
       <Router>
         <Switch>
-          {!isAuthenticated &&
+          {!isAthenticated &&
           <>
             <Route exact path="/">
               <Login />
@@ -30,7 +33,7 @@ function App() {
               <Register />
             </Route>
           </>}
-          {isAuthenticated &&
+          {isAthenticated &&
           <>
           <Route exact path="/">
             <Main />

@@ -146,8 +146,6 @@ function Widget({ access_key, token }){
           xl:min-w-80
           lg:min-w-80
           md:min-w-80
-          
-          
         `}>
         <div className="flex space-x-2 items-center border-b rounded-t h-10 min-h-10 px-2 bg-blue-800">
           <div>
@@ -177,7 +175,7 @@ function Widget({ access_key, token }){
 
 Widget.defaultProps = {
   access_key: '456',
-  token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NjAsImlhdCI6MTYwNzE4MTUzNSwiZXhwIjoxNjA3MjY3OTM1fQ.e95MmmVaHdKjZst-0KCrw5CXty_DWArITRW4y6dqyiM'
+  token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NjAsImVtYWlsIjoiY2U0MkBlbWFpbC5jb20iLCJpYXQiOjE2MDczMDc3MDIsImV4cCI6MTYwNzM5NDEwMn0.p547rD2ccWlHQED2g-MZ9lqOPA5oyklOTY_8Z378UPs'
 }
 
 Widget.propTypes = {
